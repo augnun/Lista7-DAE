@@ -1,0 +1,20 @@
+---
+title: "Exemplo 5.5"
+author: "Augusto"
+date: "25 de maio de 2016"
+output: html_document
+---
+
+#Exemplo 19.2 - Milliken & Johnson - Variedades de Trigo
+
+```{r dados}
+variedades <- rep(LETTERS[1:4], each = 4)
+respostas <- c(3.9, 3.6, 4.15, 3.35, 4.05, 4.20, 4.60, 3.80, 4.25, 4.05, 4.15, NA, NA, 3.85, 4.40, NA)
+
+trigo <- data.frame(variedades, respostas)
+trigo
+```
+
+$\bar{y}_{..}$ = `r mean(trigo$respostas, na.rm = TRUE)`
+
+$Q_0 = SSW = \sum_{i = 1}^t \sum_{j = 1}^{r_i}(y_ij - \bar{y}_{i.})^2 = \sum_{i = 1}^t \sum_{j = 1}^{r_i} y_{ij}^2 - \sum_{i = 1}^tr_i\bar{y}_{i.}^2$ = `r sum(trigo$respostas, na.rm = T)^2` - `r `

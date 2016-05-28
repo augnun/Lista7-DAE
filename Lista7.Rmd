@@ -1,0 +1,182 @@
+---
+title: "Questão Extra - Lista 7"
+author: "Augusto Cesar Ribeiro Nunes"
+date: "28 de maio de 2016"
+output: html_document
+---
+
+```{r preludio echo=F, warning=F}
+require(daewr)
+require(gmodels)
+require(phia)
+
+```
+
+
+# Introdução
+
+Este trabalho contém uma reprodução em linguagem R dos seguintes exemplos estudados em sala de aula:
+
+* Exemplo 5.5 (Milliken e Johnson, Exemplo 19.1).
+* Exemplo 6.2 (Lawson, Tabela 3.3).
+* Exemplo 6.3 (Lawson, Tabela 3.7).
+* Exemplo 6.7 (Estimação de Contrastes com SAS).
+* Exemplo 6.8 (Fatorial não balanceado).
+
+
+# Exemplo 5.5 (Milliken e Johnson, Exemplo 19.1/19.2)
+
+O Exemplo em questão trata do estudo de variedades de trigo e avalia o dano provocado nas plantações logo antes da floração. Foram selecionadas aleatoriamente quatro variedades de trigo de uma população. 
+
+A __Estrutura de Delineamento__ escolhida foi uma casualização completa com quatro repetições (lotes) por variedades - o lote é a unidade experimental. Em razão de condições climáticas, alguns dos lotes foram destruídos, inundados por fortes chuvas. Um dia antes da floração, o experimentador selecionou aleatoriamente 20 plantas de cada lote e avaliou o dano provocado pelos insetos a cada uma das plantas utilizando uma escala de 0 a 10, onde 0 indica nenhum dano e 10 indica dano severo. Portanto, a resposta medida em cada lote é a média das avaliações das 20 plantas do lote. Os dados constam na tabela a seguir:
+
+A  | B | C | D 
+------------- | -------------| ------------- | -------------
+3.90 | 3.60 | 4.15| 3.35
+4.05 | 4.20 | 4.60 | 3.80
+4.25 | 4.05 | 4.15 | .
+.    | 3.85 | 4.40 | .
+
+O modelo escolhido pelo experimentador para analisar os dados foi o Modelo de Efeitos Aleatórios com um fator. O pacote [lme4](https://cran.r-project.org/web/packages/lme4/lme4.pdf) do R oferece, entre outras opções, a possibilidade de ajustar um modelo de efeitos aleatórios a partir da especificação correta da fórmula.
+
+```{r ex5.5}
+A <- c(3.90,4.05,4.25,NA)
+B <- c(3.60,4.20,4.05,3.85)
+C <- c(4.15,4.60,4.15,4.40)
+D <- c(3.35,3.80,NA, NA)
+dados <- data.frame(A,B,C,D)
+
+
+```
+
+# Exemplo 6.2 (Lawson, Tabela 3.3).
+
+Este experimento consiste em queimar uma determinada quantidade de combustível e medir a quantidade de gás CO liberado na combustão. A unidade experimental é a porção de combustível padrão necessária para uma realização do experimento, e a resposta é a concentração de emissões de monóxido de carbono (CO) em gramas/m$^3$ determinada para aquela realização. O Fator A é a quantidade de etanol adicionada a uma unidade experimental ou porção do combustível padrão, e o Fator B é a proporção combustível-ar usada durante a queima do combustível.
+
+A = Adição de Etanol  | B = proporção ar-combustível | C = Emissão de CO 
+------------- | -------------| ------------- 
+0.1 | 14 | 66, 62
+0.1 | 15 | 72, 67
+0.1 | 16 | 68, 66
+0.2 | 14 | 78, 81
+0.2 | 15 | 80, 81
+0.2 | 16 | 66, 69
+0.3 | 14 | 90, 94
+0.3 | 15 | 75, 78
+0.3 | 16 | 60, 58
+
+```{r ex6.2}
+data(COdata)
+```
+
+
+
+# Exemplo 6.3 (Lawson, Tabela 3.7)
+
+
+
+```{r ex6.3}
+data(virus)
+mod1 <- aov( CO ~ Eth * Ratio, data = COdata )
+summary(mod1)
+
+# Example 5 p. 66
+model.tables( mod1, type = "means", se = T )
+
+# Example 6 p. 66
+c1 <- c(-1/2, 0, 1/2)
+c2 <- c(.5, -1, .5)
+cm <- cbind( c1, c2 )
+
+# Example 7 p. 67
+mod2 <- aov( CO ~ Eth * Ratio, contrasts = list( Eth = cm, Ratio = cm ), data = COdata)
+library(gmodels)
+c <- rbind('Ethanol 0.3 vs 0.1' = c(0,1,0,0,0,0,0,0,0), 'Ratio 16 vs 14' = c(0,0,0,1,0,0,0,0,0) )
+estimable(mod2,c)
+
+# Example 8 p. 67 figure 3.5
+with(COdata, (interaction.plot(Eth, Ratio, CO, type = "b", pch = c(18,24,22), leg.bty = "o",
+    main = "Interaction Plot of Ethanol and air/fuel ratio", xlab = "Ethanol",ylab = "CO emissions")))
+
+# Example 9 p. 68 Figure 3.6
+Ethanol <- COdata$Eth
+with(COdata, (interaction.plot(Ratio, Ethanol, CO, type = "b",pch = c(18,24,22), leg.bty = "o",
+    main="Interaction Plot of Ethanol and air/fuel ratio", xlab = "Ratio", ylab = "CO emissions")))
+
+# Example 10 p. 71
+library(daewr)
+rmin <- 2 # smallest number of replicates
+rmax <- 8 # largest number of replicates
+sigma <- .32
+alpha <- .05
+Delta <- 1
+nlev <- 16
+nreps <- c(rmin:rmax)
+power <- Fpower1(alpha, nlev, nreps, Delta, sigma)
+options(digits = 5)
+power
+
+# Example 11 p. 71 - 72 ##
+library(daewr)
+rmin <- 2 # smallest number of replicates
+rmax <- 4 # largest number of replicates
+alpha <- .05
+sigma <- .32
+Delta <- 1.0
+nlev <- c(4,4)
+nreps <- c(rmin:rmax)
+result <- Fpower2(alpha, nlev, nreps, Delta, sigma)
+options(digits = 5)
+result
+
+# Example 12 p. 73
+COdatam <- COdata
+COdatam[18, 3] <- NA
+
+# Example 13 p. 74
+library(car)
+mod2 <- lm( CO ~ Eth*Ratio, data = COdatam, contrasts = list( Eth = contr.sum, Ratio = contr.sum ))
+Anova( mod2, type="III" )
+
+# Example 14 p. 75
+p <- data.frame( expand.grid( Eth = c(.1, .2, .3), Ratio = c(14,15,16) ) )
+p[] <- lapply(p, factor)
+p <- cbind( yhat = predict( mod2, p), p)
+with(p, tapply(yhat, Ratio, mean) )
+
+# Example 15 p. 75
+library(lsmeans)
+lsmeans(mod2,~ Eth)
+
+# Example 16 p. 75
+lsmeans(mod2,~Ratio)
+
+# Example 17 p. 76
+library(daewr)
+data(COdata)
+Cellmeans <- tapply( COdata$CO, list(COdata$Eth, COdata$Ratio), mean )
+dim(Cellmeans) <- NULL
+Eth <- factor(rep(c(.1, .2, .3), 3))
+Ratio <- factor(rep(c(14,15,16), each=3))
+cells <- data.frame( Eth, Ratio, Cellmeans )
+modnr <- lm(Cellmeans ~ Eth*Ratio, data=cells )
+anova(modnr)
+
+# Example 18 p. 77
+Ethc <- as.ordered(cells$Eth)
+Ratioc <- as.ordered(cells$Ratio)
+
+# Example 19 p. 77
+EthLin<-contr.poly(Ethc)[Ethc,".L"]
+RatioLin <-contr.poly(Ratioc)[Ratioc,".L"]
+mbo <-lm(Cellmeans~Ethc + Ratioc + EthLin:RatioLin, data=cells)
+anova(mbo)
+
+# Example 20 p. 78
+Pred <-predict(mbo, newdata=data.frame(Ethc, Ratioc, EthLin, RatioLin))
+pred.means <- aggregate(Pred, by=list(Ethc = Ethc, Ratioc = Ratioc), "mean")
+Ethanol <- pred.means$Ethc
+interaction.plot(pred.means$Ratioc, Ethanol, pred.means$x, type="b", pch = c(18,24,22), leg.bty ="o",
+                 xlab = "Ratio", ylab = "predicted CO emissions")
+```
+

@@ -2,14 +2,14 @@
 title: "Questão Extra - Lista 7"
 author: "Augusto Cesar Ribeiro Nunes"
 date: "28 de maio de 2016"
-output: html_document
+output: pdf_document
 ---
 
-```{r preludio echo=F, warning=F}
+```{r echo=FALSE, warning=FALSE}
 require(daewr)
 require(gmodels)
 require(phia)
-
+require(lsmeans)
 ```
 
 
@@ -67,16 +67,6 @@ A = Adição de Etanol  | B = proporção ar-combustível | C = Emissão de CO
 
 ```{r ex6.2}
 data(COdata)
-```
-
-
-
-# Exemplo 6.3 (Lawson, Tabela 3.7)
-
-
-
-```{r ex6.3}
-data(virus)
 mod1 <- aov( CO ~ Eth * Ratio, data = COdata )
 summary(mod1)
 
@@ -178,5 +168,26 @@ pred.means <- aggregate(Pred, by=list(Ethc = Ethc, Ratioc = Ratioc), "mean")
 Ethanol <- pred.means$Ethc
 interaction.plot(pred.means$Ratioc, Ethanol, pred.means$x, type="b", pch = c(18,24,22), leg.bty ="o",
                  xlab = "Ratio", ylab = "predicted CO emissions")
+```
+
+
+
+# Exemplo 6.3 (Lawson, Tabela 3.7)
+
+
+
+```{r ex6.3}
+data(virus)
+Tukey1df(virus)
+```
+
+
+# Exemplo 6.7 (Estimação de Contrastes com SAS).
+
+
+```{r ex6.7}
+fatA <- rep(1:3, each = 3)
+fatB <- rep(1:3, each = 3)
+
 ```
 

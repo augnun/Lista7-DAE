@@ -2,7 +2,9 @@
 title: "Questão Extra - Lista 7"
 author: "Augusto Cesar Ribeiro Nunes"
 date: "28 de maio de 2016"
-output: pdf_document
+output:
+  html_document: default
+  pdf_document: default
 ---
 
 ```{r echo=FALSE, warning=FALSE}
@@ -23,6 +25,21 @@ Este trabalho contém uma reprodução em linguagem R dos seguintes exemplos est
 * Exemplo 6.7 (Estimação de Contrastes com SAS).
 * Exemplo 6.8 (Fatorial não balanceado).
 
+# Pacotes utilizados
+
+## __gmodels__
+Link CRAN: https://cran.r-project.org/web/packages/gmodels/  
+Este pacote contém várias funções utilizadas em ajuste de modelos, em particular `estimable`, que calcula e testa contrastes e outras funções lineares de coeficientes de modelos.
+
+## __lsmeans__
+Link CRAN: https://cran.r-project.org/web/packages/lsmeans/  
+Este pacote obtém estimativas via mínimos quadrados para diversos modelos lineares, gerais e mistos. Foi 
+
+## __daewr__ 
+Link CRAN: https://cran.r-project.org/web/packages/daewr/  
+Este pacote foi disponibilizado pelo professor [John Lawson](https://statistics.byu.edu/content/lawson-john-s), autor dos livros ["Design and Analysis of Experiments with SAS"](https://www.crcpress.com/Design-and-Analysis-of-Experiments-with-SAS/Lawson/p/book/9781420060607) e ["Design and Analysis of Experiments with R"](https://www.crcpress.com/Design-and-Analysis-of-Experiments-with-R/Lawson/p/book/9781439868133). Como dois dos Exemplos pedidos são do livro em SAS, nada mais natural que aproveitar o pacote em questão, que contém os _datasets_ - `COdata`, da Tabela 3.3 e `virus`, da Tabela 3.7 - utilizados nos livros e algumas funções, em particular `Tukey1df`, para realizar um Teste de Tukey com um grau de liberdade para um experimento fatorial sem repetição, `Fpower1` e `Fpower2`, para calcular o poder de uma ANOVA com um e dois fatores, respectivamente.  
+Importante frisar também que muito do que consta aqui foi disponibilizado no [_site_](https://jlawson.byu.edu/RBOOK/index.html) que acompanha a versão em R do livro em questão, e traduzido livremente pelo grupo.
+
 
 # Exemplo 5.5 (Milliken e Johnson, Exemplo 19.1/19.2)
 
@@ -37,7 +54,7 @@ A  | B | C | D
 4.25 | 4.05 | 4.15 | .
 .    | 3.85 | 4.40 | .
 
-O modelo escolhido pelo experimentador para analisar os dados foi o Modelo de Efeitos Aleatórios com um fator. O pacote [lme4](https://cran.r-project.org/web/packages/lme4/lme4.pdf) do R oferece, entre outras opções, a possibilidade de ajustar um modelo de efeitos aleatórios a partir da especificação correta da fórmula.
+O modelo escolhido pelo experimentador para analisar os dados foi o Modelo de Efeitos Aleatórios com um fator. 
 
 ```{r ex5.5}
 A <- c(3.90,4.05,4.25,NA)
@@ -81,22 +98,21 @@ cm <- cbind( c1, c2 )
 # Example 7 p. 67
 mod2 <- aov( CO ~ Eth * Ratio, contrasts = list( Eth = cm, Ratio = cm ), data = COdata)
 library(gmodels)
-c <- rbind('Ethanol 0.3 vs 0.1' = c(0,1,0,0,0,0,0,0,0), 'Ratio 16 vs 14' = c(0,0,0,1,0,0,0,0,0) )
+c <- rbind('Etanol 0.3 vs 0.1' = c(0,1,0,0,0,0,0,0,0), 'Proporção 16 vs 14' = c(0,0,0,1,0,0,0,0,0) )
 estimable(mod2,c)
 
 # Example 8 p. 67 figure 3.5
 with(COdata, (interaction.plot(Eth, Ratio, CO, type = "b", pch = c(18,24,22), leg.bty = "o",
-    main = "Interaction Plot of Ethanol and air/fuel ratio", xlab = "Ethanol",ylab = "CO emissions")))
+    main = "Gráfico de Interação do Etanol e proporção ar/combustível", xlab = "Etanol",ylab = "Emissao")))
 
 # Example 9 p. 68 Figure 3.6
 Ethanol <- COdata$Eth
 with(COdata, (interaction.plot(Ratio, Ethanol, CO, type = "b",pch = c(18,24,22), leg.bty = "o",
-    main="Interaction Plot of Ethanol and air/fuel ratio", xlab = "Ratio", ylab = "CO emissions")))
+    main="Gráfico de Interação do Etanol e proporção ar/combustível", xlab = "Proporção", ylab = "Emissão de CO")))
 
-# Example 10 p. 71
-library(daewr)
-rmin <- 2 # smallest number of replicates
-rmax <- 8 # largest number of replicates
+# Examplo 10 p. 71
+rmin <- 2 #  menor número de repetições
+rmax <- 8 # maior número de repetições
 sigma <- .32
 alpha <- .05
 Delta <- 1
@@ -106,10 +122,9 @@ power <- Fpower1(alpha, nlev, nreps, Delta, sigma)
 options(digits = 5)
 power
 
-# Example 11 p. 71 - 72 ##
-library(daewr)
-rmin <- 2 # smallest number of replicates
-rmax <- 4 # largest number of replicates
+# Exemplo 11 p. 71 - 72 ##
+rmin <- 2 # menor número de repetições
+rmax <- 4 # maior número de repetições
 alpha <- .05
 sigma <- .32
 Delta <- 1.0

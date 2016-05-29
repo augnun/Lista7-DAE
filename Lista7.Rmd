@@ -194,5 +194,9 @@ dados <- data.frame(fatorA = factor(fatA),
                     Y = respostas)
 mod2 <- aov(Y ~ fatorA*fatorB, data = dados)
 summary(mod2)
+
+fatA <- rep(1:3, each = 3)
+fatB <- rep(1:3, each = 3)
+
 ```
 
